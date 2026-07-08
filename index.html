@@ -194,6 +194,49 @@
   td.masked{color:var(--amber);font-weight:700}
 
   .foot-note{font-size:11.5px;color:var(--gray);margin-top:6px}
+
+  /* ===== Run stage ===== */
+  .chaos{display:flex;gap:14px;flex-wrap:wrap}
+  .chaos label{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink);cursor:pointer;background:var(--ice-soft);border:1px solid var(--ice-line);border-radius:8px;padding:8px 12px}
+  .chaos input{accent-color:var(--teal);width:15px;height:15px}
+  .chaos .warn-chip{font-size:9.5px;font-weight:800;color:var(--coral);background:var(--coral-soft);border-radius:4px;padding:1px 5px}
+  .btn-run{border:none;background:var(--navy);color:#fff;font-size:14px;font-weight:700;padding:12px 22px;border-radius:9px;cursor:pointer;box-shadow:0 3px 10px rgba(30,39,97,.3)}
+  .btn-run:hover{background:var(--navy2)}
+  .btn-run[disabled]{background:var(--gray);box-shadow:none;cursor:default}
+  .runprog{display:none;margin-top:14px}
+  .runprog.show{display:block}
+  .outcomes{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .oc{flex:1;min-width:130px;border-radius:10px;padding:12px 14px;border:1px solid var(--ice-line);background:#fff}
+  .oc .on1{font-family:var(--serif);font-size:26px;font-weight:700;line-height:1.1}
+  .oc .on2{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-top:3px}
+  .oc.loaded .on1,.oc.loaded .on2{color:var(--ok)} .oc.loaded{background:var(--ok-soft);border-color:var(--ok)}
+  .oc.quar .on1,.oc.quar .on2{color:var(--amber)} .oc.quar{background:var(--amber-soft);border-color:var(--amber)}
+  .oc.fail .on1,.oc.fail .on2{color:var(--coral)} .oc.fail{background:var(--coral-soft);border-color:var(--coral)}
+  .oc.tot .on1,.oc.tot .on2{color:var(--navy)}
+  .halt{background:var(--coral-soft);border:1px solid var(--coral);border-radius:9px;padding:12px 15px;font-size:12.5px;color:var(--ink);margin-bottom:12px}
+  .halt b{color:var(--coral)}
+  table.qtab{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px}
+  table.qtab th{background:var(--amber);color:#fff;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:6px 9px}
+  table.qtab td{padding:7px 9px;border-bottom:1px solid var(--ice-soft)}
+  .recon{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12.5px;flex-wrap:wrap}
+  .recon .rn{background:var(--ice-soft);border:1px solid var(--ice-line);border-radius:7px;padding:8px 12px}
+  .recon .rn b{color:var(--navy)}
+  .recon .req{color:var(--gray);font-weight:700}
+  .recon-ok{font-weight:800;color:var(--ok);background:var(--ok-soft);border-radius:999px;padding:5px 13px;font-family:var(--sans);font-size:12px}
+  .recon-bad{font-weight:800;color:var(--coral);background:var(--coral-soft);border-radius:999px;padding:5px 13px;font-family:var(--sans);font-size:12px}
+
+  /* ===== Observe ===== */
+  .tiles{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .tile{flex:1;min-width:140px;background:#fff;border:1px solid var(--ice-line);border-radius:10px;padding:13px 15px}
+  .tile .t1{font-family:var(--serif);font-size:24px;font-weight:700;color:var(--teal)}
+  .tile .t2{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--gray);margin-top:3px}
+  table.hist{width:100%;border-collapse:collapse;font-size:11.5px}
+  table.hist th{background:var(--navy);color:#fff;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:6px 9px}
+  table.hist td{padding:7px 9px;border-bottom:1px solid var(--ice-soft);font-family:var(--mono)}
+  .chip{font-family:var(--sans);font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:2px 9px}
+  .chip.ok{background:var(--ok-soft);color:var(--ok)}
+  .chip.failc{background:var(--coral-soft);color:var(--coral)}
+  .chip.rep{background:var(--teal-soft);color:var(--teal)}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -207,8 +250,8 @@
   <nav class="crumb" aria-label="Factory lifecycle">
     <span class="step on">1 · Define</span><span class="sep">→</span>
     <span class="step on">2 · Generate</span><span class="sep">→</span>
-    <span class="step">3 · Run</span><span class="sep">→</span>
-    <span class="step">4 · Observe</span>
+    <span class="step" id="crumbRun">3 · Run</span><span class="sep">→</span>
+    <span class="step" id="crumbObs">4 · Observe</span>
   </nav>
 </header>
 
@@ -352,12 +395,16 @@
         <button data-tab="gov" role="tab">Governance <span class="badge" id="polCount"></span></button>
         <button data-tab="cat" role="tab">Catalog &amp; lineage</button>
         <button data-tab="prev" role="tab">Data preview</button>
+        <button data-tab="run" role="tab">▶ Run &amp; quarantine</button>
+        <button data-tab="obs" role="tab">Observe <span class="badge" id="runCountBadge" style="display:none"></span></button>
       </div>
       <div class="tabpane on" id="tab-pipe"></div>
       <div class="tabpane" id="tab-gates"></div>
       <div class="tabpane" id="tab-gov"></div>
       <div class="tabpane" id="tab-cat"></div>
       <div class="tabpane" id="tab-prev"></div>
+      <div class="tabpane" id="tab-run"></div>
+      <div class="tabpane" id="tab-obs"></div>
     </div>
   </div>
 </div>
@@ -487,7 +534,7 @@ $("#staleGen").addEventListener("click", generate);
 /* ================= ARTIFACT RENDERING ================= */
 function piiFields(){ return contract.fields.filter(f=>f.pii!=="none"); }
 
-function renderArtifacts(){ renderPipeline(); renderGates(); renderGov(); renderCatalog(); renderPreview(); }
+function renderArtifacts(){ lastRun = null; renderPipeline(); renderGates(); renderGov(); renderCatalog(); renderPreview(); renderRun(); renderObserve(); }
 
 function renderPipeline(){
   const p = contract.pattern;
@@ -601,6 +648,219 @@ function renderPreview(){
   });
   html += `</tbody></table></div><div class="note">${piiFields().length? "Masked columns follow the masking policies on the Governance tab — flag or unflag a PII field in the contract and regenerate to see this change." : "No fields are currently flagged as PII, so no masking applies. Flag one in the contract and regenerate."}</div></div>`;
   $("#tab-prev").innerHTML = html;
+}
+
+/* ================= RUN STAGE ================= */
+const DEFECTS = [
+  { id:"d_null",  on:true,  label:"Row with missing site_id",           caughtBy:"nn_site",
+    row:{ site_id:"", site_name:"Unnamed rooftop", latitude:51.512, longitude:-0.093, msisdn_contact:"+447700900901", last_modified:"2026-07-07 04:20" } },
+  { id:"d_range", on:true,  label:"Latitude out of range (123.4)",      caughtBy:"rg_lat",
+    row:{ site_id:"UK-LDN-0999", site_name:"Corrupt survey point", latitude:123.4, longitude:-0.11, msisdn_contact:"+447700900902", last_modified:"2026-07-07 04:22" } },
+  { id:"d_fmt",   on:true,  label:"Malformed contact number",           caughtBy:"fmt_ms",
+    row:{ site_id:"UK-MAN-0777", site_name:"Salford Quays East", latitude:53.471, longitude:-2.293, msisdn_contact:"07700-BAD-42", last_modified:"2026-07-07 04:25" } },
+  { id:"d_dup",   on:false, label:"Duplicate primary key (UK-LDN-0042)", caughtBy:"uq_site", danger:true,
+    row:{ site_id:"UK-LDN-0042", site_name:"Shoreditch High St (dupe)", latitude:51.5236, longitude:-0.0775, msisdn_contact:"+447700900123", last_modified:"2026-07-07 04:28" } },
+];
+const CLEAN_COUNT = 9;
+let runHistory = [];
+let lastRun = null;
+let runBusy = false;
+
+function ruleFor(id){ return contract.rules.find(r=>r.id===id); }
+
+function renderRun(){
+  const pane = $("#tab-run");
+  let html = `<div class="card"><h4>Run console · simulate a production cycle</h4>
+    <p style="font-size:12.5px;color:var(--gray);margin-bottom:12px">A batch of <b>${CLEAN_COUNT} clean rows</b> plus any defects you inject below will be pushed through the generated pipeline. Watch the gates catch what the contract says they should.</p>
+    <div class="chaos">`;
+  DEFECTS.forEach(d=>{
+    html += `<label><input type="checkbox" data-defect="${d.id}" ${d.on?"checked":""}> ${d.label}${d.danger?' <span class="warn-chip">triggers fail run</span>':""}</label>`;
+  });
+  html += `</div>
+    <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn-run" id="runBtn" type="button">▶&nbsp; Run pipeline</button>
+      <span style="font-size:11.5px;color:var(--gray)">Every run is idempotent — re-running the same window produces identical results.</span>
+    </div>
+    <div class="runprog" id="runProg" aria-live="polite"></div>
+  </div>
+  <div id="runResults"></div>`;
+  pane.innerHTML = html;
+  pane.querySelectorAll("[data-defect]").forEach(c=>c.addEventListener("change",()=>{
+    const d = DEFECTS.find(x=>x.id===c.dataset.defect); d.on = c.checked;
+  }));
+  $("#runBtn").addEventListener("click", runPipeline);
+  if(lastRun) renderRunResults(lastRun);
+}
+
+async function runPipeline(){
+  if(runBusy) return; runBusy = true;
+  $("#runBtn").disabled = true;
+  const prog = $("#runProg"); prog.classList.add("show");
+  const injected = DEFECTS.filter(d=>d.on);
+  const total = CLEAN_COUNT + injected.length;
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const stages = [`Extracting ${total} rows from INV.CELL_SITE_V…`,
+                  `Validating against ${contract.rules.length} gates…`];
+  prog.innerHTML = "";
+  for(const st of stages){
+    const div = document.createElement("div"); div.className="cstep done"; div.style.color="var(--ink)";
+    div.innerHTML = `<span class="tick"></span>${st}`;
+    prog.appendChild(div);
+    if(!reduced) await new Promise(r=>setTimeout(r,450));
+  }
+
+  // evaluate gates
+  const quarantined = [], warnings = [];
+  let halted = null, loaded = 0;
+  for(const d of injected){
+    const rule = ruleFor(d.caughtBy);
+    if(rule){
+      if(rule.onFail==="fail_run"){ halted = { defect:d, rule }; }
+      else if(rule.onFail==="quarantine"){ quarantined.push({ defect:d, rule }); }
+      else warnings.push({ defect:d, rule });
+    }
+  }
+  if(ruleFor("drift")) warnings.push({ defect:{label:`row_count ${total} vs 7-day mean 12 — within 20% tolerance`}, rule:ruleFor("drift"), pass:true });
+
+  if(halted){
+    loaded = 0;
+  } else {
+    loaded = total - quarantined.length;
+  }
+  const run = {
+    id: "run-" + String(runHistory.length+1).padStart(3,"0"),
+    ts: new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}),
+    template: PAT_TPL[contract.pattern],
+    total, loaded,
+    quarantined: halted? [] : quarantined,
+    warnings, halted,
+    status: halted ? "failed" : "success",
+  };
+  const fin = document.createElement("div"); fin.className="cstep done"; fin.style.color="var(--ink)";
+  fin.innerHTML = `<span class="tick"></span>` + (halted
+    ? `Gate <b>&nbsp;${halted.rule.label}&nbsp;</b> tripped · on_fail: fail run — halting`
+    : `Merging ${loaded} rows · quarantining ${run.quarantined.length} · reconciling…`);
+  prog.appendChild(fin);
+  if(!reduced) await new Promise(r=>setTimeout(r,550));
+  prog.classList.remove("show");
+
+  lastRun = run;
+  runHistory.unshift(run);
+  $("#crumbRun").classList.add("on");
+  $("#crumbObs").classList.add("on");
+  const badge = $("#runCountBadge"); badge.style.display="inline-block"; badge.textContent = runHistory.length;
+  renderRunResults(run);
+  renderObserve();
+  $("#runBtn").disabled = false; runBusy = false;
+}
+
+function renderRunResults(run){
+  const box = $("#runResults");
+  let html = "";
+  if(run.halted){
+    html += `<div class="halt"><b>Run halted — nothing loaded.</b> Gate <b>${run.halted.rule.label}</b> is configured <b>on_fail: fail run</b> in the contract, so the load stopped before the merge. Because runs are idempotent, the target is untouched — fix the source (or change the rule's on-fail behaviour in the contract) and simply re-run.</div>`;
+  }
+  html += `<div class="outcomes">
+    <div class="oc tot"><div class="on1">${run.total}</div><div class="on2">Rows extracted</div></div>
+    <div class="oc loaded"><div class="on1">${run.loaded}</div><div class="on2">Loaded to target</div></div>
+    <div class="oc quar"><div class="on1">${run.quarantined.length}</div><div class="on2">Quarantined</div></div>
+    ${run.halted?`<div class="oc fail"><div class="on1">✕</div><div class="on2">Run failed</div></div>`:""}
+  </div>`;
+
+  // gate results
+  html += `<div class="card"><h4>Gate results</h4>`;
+  contract.rules.forEach((r,i)=>{
+    const caught = run.quarantined.filter(q=>q.rule.id===r.id).length;
+    const tripped = run.halted && run.halted.rule.id===r.id;
+    const warned = run.warnings.some(w=>w.rule && w.rule.id===r.id && !w.pass);
+    let tag, cls;
+    if(tripped){ tag="halted run"; cls="fail_run"; }
+    else if(caught){ tag=`caught ${caught}`; cls="quarantine"; }
+    else if(warned){ tag="warned"; cls="warn"; }
+    else { tag="passed"; cls=""; }
+    html += `<div class="gate"><div class="gi">G${i+1}</div><div class="gt"><b>${r.label}</b><div>evaluated on all ${run.total} rows</div></div><span class="tagm onfail ${cls||"warn"}" style="${cls?"":"background:var(--ok-soft);color:var(--ok)"}">${tag}</span></div>`;
+  });
+  html += `</div>`;
+
+  // quarantine table
+  if(run.quarantined.length){
+    html += `<div class="card"><h4>Quarantine store · replayable</h4>
+    <div style="overflow-x:auto"><table class="qtab"><thead><tr><th>site_id</th><th>defect</th><th>failed gate</th><th>run</th></tr></thead><tbody>`;
+    run.quarantined.forEach(q=>{
+      html += `<tr><td>${q.defect.row.site_id||"∅ null"}</td><td>${q.defect.label}</td><td>${q.rule.label}</td><td>${run.id}</td></tr>`;
+    });
+    html += `</tbody></table></div>
+    <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn-sm" id="replayBtn" type="button">Fix at source &amp; replay quarantined rows</button>
+      <span class="foot-note">Quarantined rows carry the failing rule, the run id and the full payload — bad data never blocks good data, and nothing is lost.</span>
+    </div></div>`;
+  }
+
+  // reconciliation
+  const ok = run.halted ? true : (run.loaded + run.quarantined.length === run.total);
+  html += `<div class="card"><h4>Reconciliation · runs every cycle, not just at onboarding</h4>
+    <div class="recon">
+      <span class="rn">source <b>${run.halted?run.total:run.total}</b></span><span class="req">=</span>
+      <span class="rn">target <b>${run.halted? "unchanged" : run.loaded}</b></span><span class="req">+</span>
+      <span class="rn">quarantine <b>${run.quarantined.length}</b></span>
+      <span class="${ok?"recon-ok":"recon-bad"}">${run.halted ? "✓ target untouched — idempotent halt" : ok ? "✓ counts & checksum match" : "✕ discrepancy — incident raised"}</span>
+    </div>
+    <div class="note">Continuous evidence of correctness is published to the observability layer — trust is demonstrated on every run, not asserted at go-live.</div>
+  </div>`;
+  box.innerHTML = html;
+  const rb = $("#replayBtn");
+  if(rb) rb.addEventListener("click",()=>replayQuarantine(run));
+}
+
+function replayQuarantine(run){
+  const n = run.quarantined.length;
+  const rep = {
+    id: run.id + "-replay",
+    ts: new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}),
+    template: run.template, total: n, loaded: n,
+    quarantined: [], warnings: [], halted: null, status: "replay",
+  };
+  run.quarantined = [];
+  run.loaded += n;
+  lastRun = run;
+  runHistory.unshift(rep);
+  const badge = $("#runCountBadge"); badge.textContent = runHistory.length;
+  renderRunResults(run);
+  renderObserve();
+}
+
+/* ================= OBSERVE ================= */
+function renderObserve(){
+  const pane = $("#tab-obs");
+  if(!runHistory.length){
+    pane.innerHTML = `<div class="card"><h4>Observability · one pane of glass</h4><p style="font-size:12.5px;color:var(--gray)">No runs yet. Head to the <b>Run &amp; quarantine</b> tab and execute the pipeline — every run publishes health, quality and reconciliation metrics here automatically.</p></div>`;
+    return;
+  }
+  const totalRows = runHistory.reduce((a,r)=>a+r.loaded,0);
+  const totalIn  = runHistory.reduce((a,r)=>a+r.total,0);
+  const q        = runHistory.reduce((a,r)=>a+(r.status==="failed"?0:r.total-r.loaded),0);
+  const succ     = runHistory.filter(r=>r.status!=="failed").length;
+  const dq = totalIn ? Math.round((1 - q/totalIn) * 1000)/10 : 100;
+  const pipeOk = Math.round(succ/runHistory.length*1000)/10;
+  let html = `<div class="tiles">
+    <div class="tile"><div class="t1">${runHistory.length}</div><div class="t2">Runs</div></div>
+    <div class="tile"><div class="t1">${pipeOk}%</div><div class="t2">Pipeline success</div></div>
+    <div class="tile"><div class="t1">${dq}%</div><div class="t2">DQ pass rate</div></div>
+    <div class="tile"><div class="t1">${totalRows}</div><div class="t2">Rows delivered</div></div>
+    <div class="tile"><div class="t1" style="color:var(--ok)">✓ met</div><div class="t2">Freshness SLA · ${contract.sla}</div></div>
+  </div>
+  <div class="card"><h4>Run ledger · bronze.netinv.cell_site</h4>
+  <div style="overflow-x:auto"><table class="hist"><thead><tr><th>Run</th><th>Time</th><th>Template</th><th>In</th><th>Loaded</th><th>Quarantined</th><th>Status</th></tr></thead><tbody>`;
+  runHistory.forEach(r=>{
+    const chip = r.status==="failed" ? `<span class="chip failc">failed</span>`
+               : r.status==="replay" ? `<span class="chip rep">replay</span>`
+               : `<span class="chip ok">success</span>`;
+    html += `<tr><td>${r.id}</td><td>${r.ts}</td><td>${r.template}</td><td>${r.total}</td><td>${r.loaded}</td><td>${r.status==="failed"?"—":r.total-r.loaded}</td><td>${chip}</td></tr>`;
+  });
+  html += `</tbody></table></div>
+  <div class="note">The ledger, KPIs and SLA status update on every run — the same dashboards operations teams use in production, per market and per domain.</div></div>`;
+  pane.innerHTML = html;
 }
 
 /* tabs */
